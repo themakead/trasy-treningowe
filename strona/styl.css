@@ -87,6 +87,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--akcent); ou
 .cel > span:first-child { display: inline !important; margin: 0 !important; }
 .cel input { width: 90px; font: inherit; padding: 8px 10px; min-height: 44px; border: 1px solid var(--pole); border-radius: var(--r); background: var(--karta); color: var(--tekst); }
 .cel input:focus { outline: 2px solid var(--akcent); outline-offset: 1px; }
+.czas { flex-wrap: wrap; row-gap: 6px; margin-top: -4px; }
+.czas input { width: 76px; }
+#tempo { width: 70px; }
+.dzis { background: var(--karta); border: 1px solid var(--linia); border-left: 4px solid var(--tekst); border-radius: var(--r);
+  padding: 10px 12px; margin: 0 0 16px; font-size: 15px; }
+.dzis b { font-family: var(--naglowki); font-size: 18px; text-transform: uppercase; display: block; }
 .wyczysc { min-height: 40px; padding: 4px 12px; background: transparent; color: var(--szary); border: 1px solid var(--pole); }
 .wyciszone { opacity: .4; }
 .zakres { font-size: 14px; color: var(--szary); margin: 0 0 10px; }

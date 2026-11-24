@@ -25,6 +25,7 @@
 <main class="uklad">
   <div id="mapa" aria-label="Mapa"></div>
   <section class="panel">
+    <p class="dzis" id="dzis" hidden></p>
     <div class="start-wiersz">
       <p class="podpowiedz" id="podpowiedz">Kliknij na mapie, skąd startujesz.</p>
       <button id="gps" class="drugi maly" title="Start z mojej lokalizacji">Moja lokalizacja</button>
@@ -54,6 +55,17 @@
       <label class="pole">
         <span>Długość <b id="dlugoscTxt">10 km</b></span>
         <input type="range" id="dlugosc" min="2" max="40" step="0.5" value="10">
+      </label>
+      <div class="pole cel czas">
+        <span>albo czas</span>
+        <input type="number" id="czas" min="10" max="300" step="5" inputmode="numeric" placeholder="np. 50" aria-label="Czas biegu w minutach">
+        <span>min, tempo</span>
+        <input type="text" id="tempo" inputmode="numeric" placeholder="6:00" maxlength="5" aria-label="Tempo w minutach na kilometr">
+        <span>/km</span>
+      </div>
+      <label class="przelacznik">
+        <input type="checkbox" id="prosto">
+        <span>Płasko i prosto <small>(pod interwały – mało podejść i zakrętów)</small></span>
       </label>
 
       <label class="pole" id="terenPole">
@@ -134,5 +146,6 @@
 <script src="podbiegi.js"></script>
 <script src="ab.js"></script>
 <script src="miejsca.js"></script>
+<script src="trening.js"></script>
 </body>
 </html>

@@ -13,7 +13,7 @@ function ustawRodzaj(r) {
     $(panel).hidden = r !== k;
   }
   warstwaTrasy.clearLayers(); $("wynik").hidden = true; $("stan").textContent = "";
-  if (location.hash) history.replaceState(null, "", location.pathname); // link dotyczy bieżącej trasy
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search); // link dotyczy bieżącej trasy
 }
 for (const k of Object.keys(RODZAJE)) $(RODZAJE[k][0]).onclick = () => rodzaj !== k && ustawRodzaj(k);
 

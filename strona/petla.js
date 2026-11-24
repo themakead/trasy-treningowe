@@ -69,6 +69,7 @@ function zapiszLink(p) {
   const par = new URLSearchParams({ t: p.tryb, km: $("dlugosc").value, h: $("teren").value, b: p.beta, p: pk });
   if (celM() !== null) par.set("c", celM());
   if ($("spokojnie").checked) par.set("s", 1);
+  if ($("prosto").checked) par.set("pr", 1);
   history.replaceState(null, "", "#" + par.toString());
 }
 
@@ -80,6 +81,7 @@ function otworzLink(hash = location.hash) {
   if (pk.length < 3) return;
   if (rodzaj !== "petla") ustawRodzaj("petla");
   $("spokojnie").checked = par.get("s") === "1";
+  $("prosto").checked = par.get("pr") === "1";
   ustawTryb(par.get("t") === "rower" ? "rower" : "bieg");
   if (par.get("km")) $("dlugosc").value = par.get("km");
   if (par.get("h")) $("teren").value = par.get("h");
@@ -99,7 +101,8 @@ window.addEventListener("hashchange", () => { if (G) otworzLink(); });
 
 $("link").onclick = async () => {
   if (!biezaca) return;
-  const url = location.href;
+  // link bez parametrów z aplikacji (osadzenie, trening dnia) – sama trasa
+  const url = location.origin + location.pathname + location.hash;
   const tekst = nazwaTrasy(biezaca);
   try {
     if (navigator.share && matchMedia("(pointer: coarse)").matches) { await navigator.share({ title: tekst, url }); return; }
@@ -231,7 +234,7 @@ function ustawStart(i) {
   $("podpowiedz").textContent = "Start ustawiony. Kliknij na mapie, żeby go zmienić.";
   kandydaci = []; ostatnieUstawienia = "";
   $("inna").disabled = true;
-  if (location.hash) history.replaceState(null, "", location.pathname);
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
 }
 
 mapa.on("click", (ev) => {
@@ -469,12 +472,14 @@ function podsumuj(trasa) {
   const linia = []; // mapa:   [lat, lon, odległość od startu]
   const naw = [0, 0, 0];
   let zielono = 0, szlakiem = 0;
-  let zawrotki = 0, poprz = null;
+  let zawrotki = 0, skrety = 0, poprz = null;
   for (const [e, fwd] of trasa) {
     const L = G.DL[e];
     if (poprz) {
       const [pe, pf] = poprz, o = pf ? 2 : 0, o2 = fwd ? 0 : 2;
-      if (-(KIER[4 * pe + o] * KIER[4 * e + o2] + KIER[4 * pe + o + 1] * KIER[4 * e + o2 + 1]) < -0.3) zawrotki++;
+      const c = -(KIER[4 * pe + o] * KIER[4 * e + o2] + KIER[4 * pe + o + 1] * KIER[4 * e + o2 + 1]);
+      if (c < -0.3) zawrotki++;
+      if (c < 0.7) skrety++;   // zakręt ostrzejszy niż ~45° (do „płasko i prosto”)
     }
     poprz = [e, fwd];
     if (byly.has(e)) powt += L; byly.add(e);
@@ -498,7 +503,7 @@ function podsumuj(trasa) {
   }
   let max = -Infinity, min = Infinity;
   for (const [h] of pkt) { if (h > max) max = h; if (h < min) min = h; }
-  return { trasa, dl, up, powt, pkt, linia, naw, max, min, tryb, zawrotki, zielono, szlakiem };
+  return { trasa, dl, up, powt, pkt, linia, naw, max, min, tryb, zawrotki, skrety, zielono, szlakiem };
 }
 
 function policzKandydatow() {
@@ -538,7 +543,11 @@ function wybierz(nastepny = false) {
   const cel = celM();
   // kolejność od najlepiej pasującej: do zadanych metrów albo do pozycji suwaka terenu
   let pos;
-  if (cel !== null) {
+  if ($("prosto").checked) {
+    // „Płasko i prosto”: mało podejścia (m/km) i mało zakrętów (na km) – oba liczą się tak samo
+    const ocena = (p) => (p.up / p.dl) * 1000 + (p.skrety / p.dl) * 1000;
+    pos = kandydaci.slice().sort((a, b) => ocena(a) - ocena(b));
+  } else if (cel !== null) {
     pos = kandydaci.slice().sort((a, b) => Math.abs(a.up - cel) - Math.abs(b.up - cel));
   } else {
     const h = +$("teren").value;
