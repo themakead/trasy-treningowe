@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trasy treningowe – Baranowo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styl.css">
+</head>
+<body>
+<header class="pasek">
+  <span class="logo" aria-label="sportpluss">
+    <span aria-hidden="true"><span class="zolty">#</span>sportpl<span class="zolty">uss</span></span>
+    <svg viewBox="0 0 120 16" fill="none" aria-hidden="true" preserveAspectRatio="none"><path d="M3 10.5C30 12.5 70 11.5 112 7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M103 2.5L114 7.3L104.5 13.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </span>
+  <h1>Trasy treningowe</h1>
+</header>
+<main class="uklad">
+  <div id="mapa" aria-label="Mapa"></div>
+  <section class="panel">
+    <div class="start-wiersz">
+      <p class="podpowiedz" id="podpowiedz">Kliknij na mapie, skąd startujesz.</p>
+      <button id="gps" class="drugi maly" title="Start z mojej lokalizacji">Moja lokalizacja</button>
+    </div>
+
+    <div class="tryb zakladki" role="tablist" aria-label="Co szukamy">
+      <button id="rodzajPetla" role="tab" aria-selected="true" class="wybrany">Pętla</button>
+      <button id="rodzajPodbiegi" role="tab" aria-selected="false">Podbiegi</button>
+      <button id="rodzajAB" role="tab" aria-selected="false">A → B</button>
+    </div>
+
+    <div class="tryb" role="radiogroup" aria-label="Rodzaj treningu">
+      <button id="trybBieg" role="radio" aria-checked="true" class="wybrany">Bieg</button>
+      <button id="trybRower" role="radio" aria-checked="false">Rower</button>
+    </div>
+
+    <label class="przelacznik">
+      <input type="checkbox" id="spokojnie">
+      <span>Omijaj ruchliwe ulice <small>(więcej ścieżek i lasów)</small></span>
+    </label>
+
+    <div id="panelPetla">
+      <label class="pole">
+        <span>Długość <b id="dlugoscTxt">10 km</b></span>
+        <input type="range" id="dlugosc" min="2" max="40" step="0.5" value="10">
+      </label>
+
+      <label class="pole" id="terenPole">
+        <span>Teren <b id="terenTxt">mieszany</b></span>
+        <input type="range" id="teren" min="0" max="1" step="0.05" value="0.5">
+        <span class="skala"><span>płasko</span><span>pagórkowato</span></span>
+      </label>
+      <label class="pole cel">
+        <span>albo podejście ok.</span>
+        <input type="number" id="cel" min="0" max="2000" step="10" inputmode="numeric" placeholder="np. 80">
+        <span>m</span>
+        <button type="button" id="celWyczysc" class="wyczysc" aria-label="Wyczyść podejście" hidden>×</button>
+      </label>
+
+      <div class="przyciski">
+        <button id="wyznacz" class="glowny">Wyznacz pętlę</button>
+        <button id="inna" class="drugi" disabled>Inna propozycja</button>
+      </div>
+    </div>
+
+    <div id="panelPodbiegi" hidden>
+      <label class="pole">
+        <span>Długość podbiegu <b id="pbDlTxt">200 m</b></span>
+        <input type="range" id="pbDl" min="100" max="1000" step="50" value="200">
+      </label>
+      <label class="pole">
+        <span>Nachylenie co najmniej <b id="pbNachTxt">4%</b></span>
+        <input type="range" id="pbNach" min="2" max="10" step="0.5" value="4">
+      </label>
+      <label class="pole">
+        <span>Szukaj do <b id="pbZasTxt">2 km</b> od startu</span>
+        <input type="range" id="pbZas" min="0.5" max="5" step="0.5" value="2">
+      </label>
+      <div class="przyciski">
+        <button id="szukajPodbiegow" class="glowny">Szukaj podbiegów</button>
+      </div>
+      <div id="listaPodbiegow" class="lista"></div>
+    </div>
+
+    <div id="panelAB" hidden>
+      <label class="pole" id="abPole">
+        <span>Trasa <b id="abTxt">–</b></span>
+        <input type="range" id="abSuwak" min="0" max="0" step="1" value="0" disabled>
+        <span class="skala"><span>najkrócej</span><span>najpłaściej</span></span>
+      </label>
+      <div class="przyciski">
+        <button id="abZamien" class="drugi" disabled>Zamień A ↔ B</button>
+      </div>
+    </div>
+
+    <div id="wynik" hidden>
+      <p class="zakres" id="zakres"></p>
+      <div class="liczby">
+        <div><span id="wDystOpis">Dystans</span><b id="wDyst">–</b></div>
+        <div><span>Podejście</span><b id="wUp">–</b></div>
+        <div><span>Najwyżej</span><b id="wMax">–</b></div>
+      </div>
+      <div class="profil">
+        <svg id="profil" viewBox="0 0 600 160" preserveAspectRatio="none" role="img" aria-label="Profil wysokości"></svg>
+        <div class="profil-os"><span id="pMin"></span><span id="pInfo"></span><span id="pMax"></span></div>
+        <div class="legenda" aria-hidden="true">
+          <span><i class="n1"></i>3–6%</span><span><i class="n2"></i>6–9%</span><span><i class="n3"></i>9% i więcej</span>
+        </div>
+      </div>
+      <p class="nawierzchnia" id="wStromo"></p>
+      <p class="nawierzchnia" id="wNaw"></p>
+      <div class="przyciski dol">
+        <button id="gpx" class="drugi">Pobierz GPX</button>
+        <button id="link" class="drugi">Udostępnij link</button>
+      </div>
+    </div>
+    <p class="stan" id="stan">Wczytuję sieć dróg…</p>
+    <p class="zrodla">Dane: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> (ODbL), wysokości: GUGiK (NMT).</p>
+  </section>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="petla.js"></script>
+<script src="podbiegi.js"></script>
+<script src="ab.js"></script>
+</body>
+</html>

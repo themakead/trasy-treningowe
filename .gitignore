@@ -1,0 +1,13 @@
+.venv/
+dane/surowe/
+__pycache__/
+.env
+zrzuty/
+# notatki robocze – zostają tylko na dysku (repozytorium jest publiczne)
+CLAUDE.md
+00-WIEDZA-PROJEKTU.md
+DZIENNIK.md
+JAK-ZACZAC.md
+PROCES-PRACY.md
+WZORCE.md
+dane/statystyki.txt
