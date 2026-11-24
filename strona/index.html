@@ -11,6 +11,10 @@
 <link rel="stylesheet" href="styl.css">
 </head>
 <body>
+<script>
+  // Wewnątrz aplikacji sportpluss (ramka, ?osadzone=1) pasek z logo jest zbędny – aplikacja ma swój
+  if (new URLSearchParams(location.search).has("osadzone")) document.body.classList.add("osadzone");
+</script>
 <header class="pasek">
   <span class="logo" aria-label="sportpluss">
     <span aria-hidden="true"><span class="zolty">#</span>sportpl<span class="zolty">uss</span></span>

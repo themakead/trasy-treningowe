@@ -60,6 +60,7 @@ body { display: flex; flex-direction: column; }
 .pasek h1 { margin: 0; padding-left: 14px; border-left: 1px solid rgba(255,255,255,.25); font-family: var(--naglowki);
   font-weight: 700; font-size: 20px; text-transform: uppercase; letter-spacing: .02em; color: var(--pasek-szary); }
 
+.osadzone .pasek { display: none; }
 .uklad { display: flex; flex: 1; min-height: 0; }
 #mapa { flex: 1; min-height: 300px; }
 .panel { width: 400px; padding: 20px; overflow-y: auto; background: var(--panel); border-left: 1px solid var(--linia); }
